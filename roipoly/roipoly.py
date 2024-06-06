@@ -1,7 +1,3 @@
-"""Draw polygon regions of interest (ROIs) in matplotlib images,
-similar to Matlab's roipoly function.
-"""
-
 import sys
 import logging
 import warnings
@@ -213,17 +209,21 @@ class RoiPoly:
                 # Close the loop and disconnect
                 logger.debug("Received single right mouse button click or "
                              "double left click")
-                self.fig.canvas.mpl_disconnect(self.__cid1)
-                self.fig.canvas.mpl_disconnect(self.__cid2)
+                if len(self.x) == 1 and len(self.y) == 1:
+                    # If only one point is added, consider it as a single point ROI
+                    self.completed = True
+                else:
+                    self.fig.canvas.mpl_disconnect(self.__cid1)
+                    self.fig.canvas.mpl_disconnect(self.__cid2)
 
-                self.line.set_data([self.previous_point[0],
-                                    self.start_point[0]],
-                                   [self.previous_point[1],
-                                    self.start_point[1]])
-                ax.add_line(self.line)
-                self.fig.canvas.draw()
-                self.line = None
-                self.completed = True
+                    self.line.set_data([self.previous_point[0],
+                                        self.start_point[0]],
+                                       [self.previous_point[1],
+                                        self.start_point[1]])
+                    ax.add_line(self.line)
+                    self.fig.canvas.draw()
+                    self.line = None
+                    self.completed = True
 
                 if not sys.flags.interactive and self.close_figure:
                     #  Figure has to be closed so that code can continue
